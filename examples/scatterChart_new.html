@@ -50,6 +50,9 @@ div {
   <div id="test3" class="chartWrap">
     <svg></svg>
   </div>
+  <div id="test4" class="chartWrap">
+    <svg></svg>
+  </div>
 </div>
 
 <script src="../lib/d3.v2.js"></script>
@@ -138,6 +141,46 @@ nv.addGraph(function() {
   return chart;
 });
 
+/*
+// **** Somethign FUNKY is happening, this maps the series right the first time around.. but screws up after
+// ****** Likely a abd idea to remap liek this, performance takes a big hit if everytime series is accessed all this recalculation occurs.
+nv.addGraph(function() {
+  var chart = nv.models.scatterChart()
+                .showDistX(true)
+                .showDistY(true)
+                .series(function(d) {
+                  var data = [];
+                  for (var i = 0; i < 4; i++ ) {
+                    data.push({
+                      key: 'Group ' + i,
+                      values: []
+                    })
+                  }
+                  d[0].values.forEach(function(p,j) {
+                    for (var i = 0; i < 4; i++ ) {
+                    //nv.log(p, p['y' + i]);
+                      data[i].values.push({x: p.x, y: p['y' + i], size: p.size, shape: p.shape });
+                    }
+                  })
+                  nv.log(data);
+                  return data;
+                })
+                .color(d3.scale.category10().range());
+
+  chart.xAxis.tickFormat(d3.format('.02f'))
+  chart.yAxis.tickFormat(d3.format('.02f'))
+
+  d3.select('#test4 svg')
+      .datum(randomData4(40))
+    .transition().duration(500)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+*/
+
 
 function randomData1(groups, points) { //# groups,# points per group
   var data = [],
@@ -209,6 +252,34 @@ function randomData3(groups, points) { //# groups,# points per group
 
   return data;
 }
+
+
+
+function randomData4(points) {
+  var data = [],
+      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
+      random = d3.random.normal();
+
+    data.push({
+      key: 'Group',
+      values: []
+    });
+
+    for (j = 0; j < points; j++) {
+      data[0].values.push({
+        x: random(),
+        y0: random(),
+        y1: random(),
+        y2: random(),
+        y3: random(),
+        size: Math.random(),
+        shape: shapes[j % 6]
+      });
+    }
+
+  return data;
+}
+
 
 
 </script>
