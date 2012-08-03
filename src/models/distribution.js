@@ -5,6 +5,8 @@ nv.models.distribution = function() {
       size = 8,
       axis = 'x', // 'x' or 'y'... horizontal or vertical
       getData = function(d) { return d[axis] },  // defaults d.x or d.y
+      getSeries   = function(d) { return d }, // accessor to get the array of series from the initial data structure provided
+      getPoints   = function(d) { return d.values }, // accessor to get the array of pointd from the array of series
       color = nv.utils.defaultColor(),
       domain;
 
@@ -35,7 +37,7 @@ nv.models.distribution = function() {
       wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
       var distWrap = g.selectAll('g.nv-dist')
-          .data(function(d) { return d }, function(d) { return d.key });
+          .data(getSeries, function(d) { return d.key });
 
       distWrap.enter().append('g')
       distWrap
@@ -44,7 +46,7 @@ nv.models.distribution = function() {
           //.style('stroke', function(d,i) { return color.filter(function(d,i) { return data[i] && !data[i].disabled })[i % color.length] });
 
       var dist = distWrap.selectAll('line.nv-dist' + axis)
-          .data(function(d) { return d.values })
+          .data(getPoints)
       dist.enter().append('line')
           .attr(axis + '1', function(d,i) { return scale0(getData(d,i)) })
           .attr(axis + '2', function(d,i) { return scale0(getData(d,i)) })
@@ -71,6 +73,18 @@ nv.models.distribution = function() {
     return chart;
   }
 
+
+  chart.series = function(_) {
+    if (!arguments.length) return getSeries;
+    getSeries = _;
+    return chart;
+  };
+
+  chart.points = function(_) {
+    if (!arguments.length) return getPoints;
+    getPoints = _;
+    return chart;
+  };
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;

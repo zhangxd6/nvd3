@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+
+<style>
+
+body {
+  overflow-y:scroll;
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  overflow: hidden;
+}
+
+div {
+  border: 0;
+  margin: 0;
+}
+
+/*
+#offsetDiv {
+  margin-left: 100px;
+  margin-top: 100px;
+}
+*/
+
+
+.chartWrap {
+  margin: 0;
+}
+
+.chartWrap svg {
+  height: 500px;
+}
+
+</style>
+
+<body>
+
+<div id="offsetDiv">
+  <div id="test1" class="chartWrap">
+    <svg></svg>
+  </div>
+  <div id="test2" class="chartWrap">
+    <svg></svg>
+  </div>
+  <div id="test3" class="chartWrap">
+    <svg></svg>
+  </div>
+</div>
+
+<script src="../lib/d3.v2.js"></script>
+<script src="../lib/fisheye.js"></script>
+<script src="../nv.d3.js"></script>
+<script src="../src/tooltip.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/models/legend.js"></script>
+<script src="../src/models/axis.js"></script>
+<script src="../src/models/distribution.js"></script>
+<script src="../src/models/scatter_new.js"></script>
+<script src="../src/models/scatterChart_new.js"></script>
+<script>
+
+
+
+nv.addGraph(function() {
+  var chart = nv.models.scatterChart()
+                .showDistX(true)
+                .showDistY(true)
+                .color(d3.scale.category10().range());
+
+  chart.xAxis.tickFormat(d3.format('.02f'))
+  chart.yAxis.tickFormat(d3.format('.02f'))
+
+  d3.select('#test1 svg')
+      .datum(randomData1(4,40))
+    .transition().duration(500)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+
+
+nv.addGraph(function() {
+  var chart = nv.models.scatterChart()
+                .showDistX(true)
+                .showDistY(true)
+                .points(function(d) { return d.points })
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .size(function(d) { return d[2] })
+                .shape(function(d) { return d[3] })
+                .color(d3.scale.category10().range());
+
+  chart.xAxis.tickFormat(d3.format('.02f'))
+  chart.yAxis.tickFormat(d3.format('.02f'))
+
+  d3.select('#test2 svg')
+      .datum(randomData2(4,40))
+    .transition().duration(500)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+
+
+nv.addGraph(function() {
+  var chart = nv.models.scatterChart()
+                .showDistX(true)
+                .showDistY(true)
+                .series(function(d) { return d })
+                //.seriesKey(['Group 0', 'Group 1', 'Group 2', 'Group 3'])
+                .seriesKey(function(d,i) { return 'Group ' + i }) //setting series keys liek this screws up when series are disabled!
+                .points(function(d) { return d })
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .size(function(d) { return d[2] })
+                .shape(function(d) { return d[3] })
+                .color(d3.scale.category10().range());
+
+  chart.xAxis.tickFormat(d3.format('.02f'))
+  chart.yAxis.tickFormat(d3.format('.02f'))
+
+  d3.select('#test3 svg')
+      .datum(randomData3(4,40))
+    .transition().duration(500)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+
+
+function randomData1(groups, points) { //# groups,# points per group
+  var data = [],
+      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
+      random = d3.random.normal();
+
+  for (i = 0; i < groups; i++) {
+    data.push({
+      key: 'Group ' + i,
+      values: []
+    });
+
+    for (j = 0; j < points; j++) {
+      data[i].values.push({
+        x: random(),
+        y: random(),
+        size: Math.random(),
+        shape: shapes[j % 6]
+      });
+    }
+  }
+
+  return data;
+}
+
+
+function randomData2(groups, points) { //# groups,# points per group
+  var data = [],
+      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
+      random = d3.random.normal();
+
+  for (i = 0; i < groups; i++) {
+    data.push({
+      key: 'Group ' + i,
+      points: []
+    });
+
+    for (j = 0; j < points; j++) {
+      data[i].points.push([
+        random(), 
+        random(), 
+        Math.random(), 
+        shapes[j % 6]
+      ]);
+    }
+  }
+
+  return data;
+}
+
+
+function randomData3(groups, points) { //# groups,# points per group
+  var data = [],
+      shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
+      random = d3.random.normal();
+
+  for (i = 0; i < groups; i++) {
+    data.push([]);
+
+    for (j = 0; j < points; j++) {
+      data[i].push([
+        random(),
+        random(),
+        Math.random(),
+        shapes[j % 6]
+      ]);
+    }
+  }
+
+  return data;
+}
+
+
+</script>
