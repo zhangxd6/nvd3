@@ -1102,7 +1102,7 @@ nv.models.bulletChart = function() {
     var content = '<h3>' + e.label + '</h3>' +
             '<p>' + e.value + '</p>';
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'e' : 'w');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'e' : 'w', null, offsetElement);
   };
 
 
@@ -1120,6 +1120,8 @@ nv.models.bulletChart = function() {
       //------------------------------------------------------------
       // Display No Data message if there's nothing to show.
 
+      /*
+      // Disabled until I figure out a better way to check for no data with the bullet chart
       if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
         container.append('text')
           .attr('class', 'nvd3 nv-noData')
@@ -1132,6 +1134,7 @@ nv.models.bulletChart = function() {
       } else {
         container.select('.nv-noData').remove();
       }
+      */
 
       //------------------------------------------------------------
 
@@ -1428,7 +1431,7 @@ nv.models.cumulativeLineChart = function() {
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content);
+    nv.tooltip.show([left, top], content, null, null, offsetElement);
   };
 
 
@@ -2108,7 +2111,7 @@ nv.models.discreteBarChart = function() {
         y = yAxis.tickFormat()(discretebar.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
 
@@ -3195,7 +3198,7 @@ nv.models.lineChart = function() {
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content);
+    nv.tooltip.show([left, top], content, null, null, offsetElement);
   };
 
 
@@ -3468,7 +3471,7 @@ nv.models.linePlusBarChart = function() {
         y = (e.series.bar ? yAxis1 : yAxis2).tickFormat()(lines.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
 
@@ -3816,7 +3819,7 @@ nv.models.lineWithFocusChart = function() {
         y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content);
+    nv.tooltip.show([left, top], content, null, null, offsetElement);
   };
 
 
@@ -4679,7 +4682,7 @@ nv.models.multiBarChart = function() {
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
 
@@ -5391,7 +5394,7 @@ nv.models.multiBarHorizontalChart = function() {
         y = yAxis.tickFormat()(multibar.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'e' : 'w');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'e' : 'w', null, offsetElement);
   };
 
   //TODO: let user select default
@@ -6753,7 +6756,7 @@ nv.models.pieChart = function() {
         y = pie.valueFormat()(pie.y()(e.point)),
         content = tooltip(pie.x()(e.point), y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
 
@@ -6962,6 +6965,7 @@ nv.models.scatter = function() {
    ,  xDomain     = null // Override x domain (skips the calculation from data)
    ,  yDomain     = null // Override y domain
    ,  sizeDomain  = null // Override point size domain
+   ,  sizeRange   = null
    ,  singlePoint = false
    ,  dispatch    = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
    ;
@@ -7017,7 +7021,7 @@ nv.models.scatter = function() {
           .range([availableHeight, 0]);
 
       z   .domain(sizeDomain || d3.extent(seriesData.map(function(d) { return d.size }).concat(forceSize)))
-          .range([16, 256]);
+          .range(sizeRange || [16, 256]);
 
       // If scale's domain don't have a range, slightly adjust to make one... so a chart can show a single data point
       if (x.domain()[0] === x.domain()[1] || y.domain()[0] === y.domain()[1]) singlePoint = true;
@@ -7318,6 +7322,12 @@ nv.models.scatter = function() {
     sizeDomain = _;
     return chart;
   };
+  
+  chart.sizeRange = function(_) {
+    if (!arguments.length) return sizeRange;
+    sizeRange = _;
+    return chart;
+  };
 
   chart.forceX = function(_) {
     if (!arguments.length) return forceX;
@@ -7455,11 +7465,11 @@ nv.models.scatterChart = function() {
         yVal = yAxis.tickFormat()(scatter.y()(e.point, e.pointIndex));
 
       if( tooltipX != null )
-          nv.tooltip.show([leftX, topX], tooltipX(e.series.key, xVal, yVal, e, chart), 'n', 1, null, 'x-nvtooltip');
+          nv.tooltip.show([leftX, topX], tooltipX(e.series.key, xVal, yVal, e, chart), 'n', 1, offsetElement, 'x-nvtooltip');
       if( tooltipY != null )
-          nv.tooltip.show([leftY, topY], tooltipY(e.series.key, xVal, yVal, e, chart), 'e', 1, null, 'y-nvtooltip');
+          nv.tooltip.show([leftY, topY], tooltipY(e.series.key, xVal, yVal, e, chart), 'e', 1, offsetElement, 'y-nvtooltip');
       if( tooltip != null )
-          nv.tooltip.show([left, top], tooltip(e.series.key, xVal, yVal, e, chart), e.value < 0 ? 'n' : 's');
+          nv.tooltip.show([left, top], tooltip(e.series.key, xVal, yVal, e, chart), e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
   var controlsData = [
@@ -7590,36 +7600,37 @@ nv.models.scatterChart = function() {
       g.select('.nv-y.nv-axis')
           .call(yAxis);
 
-
-      distX
-          .getData(scatter.x())
-          .scale(x)
-          .width(availableWidth)
-          .color(data.map(function(d,i) {
-            return d.color || color(d, i);
-          }).filter(function(d,i) { return !data[i].disabled }));
-      gEnter.select('.nv-distWrap').append('g')
-          .attr('class', 'nv-distributionX')
-          .attr('transform', 'translate(0,' + y.range()[0] + ')');
-      g.select('.nv-distributionX')
-          .datum(data.filter(function(d) { return !d.disabled }))
-          .call(distX);
-
-
-      distY
-          .getData(scatter.y())
-          .scale(y)
-          .width(availableHeight)
-          .color(data.map(function(d,i) {
-            return d.color || color(d, i);
-          }).filter(function(d,i) { return !data[i].disabled }));
-      gEnter.select('.nv-distWrap').append('g')
-          .attr('class', 'nv-distributionY')
-          .attr('transform', 'translate(-' + distY.size() + ',0)');
-      g.select('.nv-distributionY')
-          .datum(data.filter(function(d) { return !d.disabled }))
-          .call(distY);
-
+      if(showDistX){
+	      distX
+	          .getData(scatter.x())
+	          .scale(x)
+	          .width(availableWidth)
+	          .color(data.map(function(d,i) {
+	            return d.color || color(d, i);
+	          }).filter(function(d,i) { return !data[i].disabled }));
+	      gEnter.select('.nv-distWrap').append('g')
+	          .attr('class', 'nv-distributionX')
+	          .attr('transform', 'translate(0,' + y.range()[0] + ')');
+	      g.select('.nv-distributionX')
+	          .datum(data.filter(function(d) { return !d.disabled }))
+	          .call(distX);
+	   }	
+	
+	   if(showDistY){
+	      distY
+	          .getData(scatter.y())
+	          .scale(y)
+	          .width(availableHeight)
+	          .color(data.map(function(d,i) {
+	            return d.color || color(d, i);
+	          }).filter(function(d,i) { return !data[i].disabled }));
+	      gEnter.select('.nv-distWrap').append('g')
+	          .attr('class', 'nv-distributionY')
+	          .attr('transform', 'translate(-' + distY.size() + ',0)');
+	      g.select('.nv-distributionY')
+	          .datum(data.filter(function(d) { return !d.disabled }))
+	          .call(distY);
+	  }
 
       g.select('.nv-background').on('mousemove', updateFisheye);
       g.select('.nv-background').on('click', function() { pauseFisheye = !pauseFisheye;});
@@ -7764,7 +7775,7 @@ nv.models.scatterChart = function() {
   chart.distX = distX;
   chart.distY = distY;
 
-  d3.rebind(chart, scatter, 'id', 'interactive', 'pointActive', 'x', 'y', 'shape', 'size', 'xScale', 'yScale', 'zScale', 'xDomain', 'yDomain', 'sizeDomain', 'forceX', 'forceY', 'forceSize', 'clipVoronoi', 'clipRadius');
+  d3.rebind(chart, scatter, 'id', 'interactive', 'pointActive', 'x', 'y', 'shape', 'size', 'xScale', 'yScale', 'zScale', 'xDomain', 'yDomain', 'sizeDomain', 'sizeRange', 'forceX', 'forceY', 'forceSize', 'clipVoronoi', 'clipRadius');
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
@@ -8536,7 +8547,7 @@ nv.models.stackedAreaChart = function() {
         y = yAxis.tickFormat()(stacked.y()(e.point, e.pointIndex)),
         content = tooltip(e.series.key, x, y, e, chart);
 
-    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's');
+    nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null, offsetElement);
   };
 
 
