@@ -74,11 +74,15 @@ nv.models.scatter = function() {
       // remap and flatten the data for use in calculating the scales' domains
       var seriesData = (xDomain && yDomain && sizeDomain) ? [] : // if we know xDomain and yDomain and sizeDomain, no need to calculate.... if Size is constant remember to set sizeDomain to speed up performance
             d3.merge(
-              getSeries(data).map(function(d,j) {
-                return getPoints(d,j).map(function(d,i) {
-                  return { x: getX(d,i), y: getY(d,i), size: getSize(d,i) }
+              getSeries(data)
+                .filter(function(d,j) {
+                  return !d.disabled
                 })
-              })
+                .map(function(d,j) {
+                  return getPoints(d,j).map(function(d,i) {
+                    return { x: getX(d,i), y: getY(d,i), size: getSize(d,i) }
+                  })
+                })
             );
 
       x   .domain(xDomain || d3.extent(seriesData.map(function(d) { return d.x }).concat(forceX)))
@@ -152,15 +156,16 @@ nv.models.scatter = function() {
         if (!interactive) return false;
 
 
-        var vertices = d3.merge(getSeries(data).map(function(group, groupIndex) {
-            return getPoints(group, groupIndex)
-              .filter(pointActive) // remove non-interactive points
-              .map(function(point, pointIndex) {
-                // *Adding noise to make duplicates very unlikely
-                // **Injecting series and point index for reference
-                return [x(getX(point,pointIndex)) * (Math.random() / 1e12 + 1)  , y(getY(point,pointIndex)) * (Math.random() / 1e12 + 1), groupIndex, pointIndex]; //temp hack to add noise untill I think of a better way so there are no duplicates
-              })
-          })
+        var vertices = d3.merge(getSeries(data)
+            .map(function(group, groupIndex) {
+              return group.disabled? [] : getPoints(group, groupIndex)
+                .filter(pointActive) // remove non-interactive points
+                .map(function(point, pointIndex) {
+                  // *Adding noise to make duplicates very unlikely
+                  // **Injecting series and point index for reference
+                  return [x(getX(point,pointIndex)) * (Math.random() / 1e12 + 1)  , y(getY(point,pointIndex)) * (Math.random() / 1e12 + 1), groupIndex, pointIndex]; //temp hack to add noise untill I think of a better way so there are no duplicates
+                })
+            })
         );
 
 
@@ -253,8 +258,8 @@ nv.models.scatter = function() {
       d3.transition(groups)
           .style('fill', function(d,i) { return color(d, i) })
           .style('stroke', function(d,i) { return color(d, i) })
-          .style('stroke-opacity', 1)
-          .style('fill-opacity', .5);
+          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 })
+          .style('fill-opacity', function(d,i) { return d.disabled ? 0 : .5 });
 
 
       var points = groups.selectAll('path.nv-point')

@@ -167,12 +167,14 @@ nv.models.scatterChart = function() {
       scatter
           .width(availableWidth)
           .height(availableHeight)
+          /*
           .color(scatter.series()(data).map(function(d,i) {
             return d.color || color(d, i);
           }).filter(function(d,i) { return !scatter.series()(data)[i].disabled }))
+          */
 
       wrap.select('.nv-scatterWrap')
-          .datum(scatter.series()(data).filter(function(d) { return !d.disabled }))
+          .datum(data)
           .call(scatter);
 
 
@@ -201,14 +203,15 @@ nv.models.scatterChart = function() {
           .points(scatter.points())
           .scale(x)
           .width(availableWidth)
-          .color(scatter.series()(data).map(function(d,i) {
-            return d.color || color(d, i);
-          }).filter(function(d,i) { return !scatter.series()(data)[i].disabled }));
+          //.color(scatter.series()(data).map(function(d,i) {
+            //return d.color || color(d, i);
+          //}).filter(function(d,i) { return !scatter.series()(data)[i].disabled }));
       gEnter.select('.nv-distWrap').append('g')
           .attr('class', 'nv-distributionX')
           .attr('transform', 'translate(0,' + y.range()[0] + ')');
       g.select('.nv-distributionX')
-          .datum(scatter.series()(data).filter(function(d) { return !d.disabled }))
+          .datum(data)
+          //.datum(scatter.series()(data).filter(function(d) { return !d.disabled }))
           .call(distX);
 
 
@@ -218,14 +221,15 @@ nv.models.scatterChart = function() {
           .points(scatter.points())
           .scale(y)
           .width(availableHeight)
-          .color(scatter.series()(data).map(function(d,i) {
-            return d.color || color(d, i);
-          }).filter(function(d,i) { return !scatter.series()(data)[i].disabled }));
+          //.color(scatter.series()(data).map(function(d,i) {
+            //return d.color || color(d, i);
+          //}).filter(function(d,i) { return !scatter.series()(data)[i].disabled }));
       gEnter.select('.nv-distWrap').append('g')
           .attr('class', 'nv-distributionY')
           .attr('transform', 'translate(-' + distY.size() + ',0)');
       g.select('.nv-distributionY')
-          .datum(scatter.series()(data).filter(function(d) { return !d.disabled }))
+          .datum(data)
+          //.datum(scatter.series()(data).filter(function(d) { return !d.disabled }))
           .call(distY);
 
 
@@ -249,15 +253,18 @@ nv.models.scatterChart = function() {
         y.distortion(fisheye).focus(mouse[1]);
 
         g.select('.nv-scatterWrap')
-            .datum(data.filter(function(d) { return !d.disabled }))
+            //.datum(data.filter(function(d) { return !d.disabled }))
+            .datum(data)
             .call(scatter);
         g.select('.nv-x.nv-axis').call(xAxis);
         g.select('.nv-y.nv-axis').call(yAxis);
         g.select('.nv-distributionX')
-            .datum(data.filter(function(d) { return !d.disabled }))
+            //.datum(data.filter(function(d) { return !d.disabled }))
+            .datum(data)
             .call(distX);
         g.select('.nv-distributionY')
-            .datum(data.filter(function(d) { return !d.disabled }))
+            //.datum(data.filter(function(d) { return !d.disabled }))
+            .datum(data)
             .call(distY);
       }
 
@@ -395,6 +402,7 @@ nv.models.scatterChart = function() {
   chart.color = function(_) {
     if (!arguments.length) return color;
     color = nv.utils.getColor(_);
+    scatter.color(color);
     legend.color(color);
     distX.color(color);
     distY.color(color);
