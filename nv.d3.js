@@ -267,7 +267,7 @@ nv.utils.getColor = function(color){
 //
 nv.utils.defaultColor = function(){
     var colors = d3.scale.category20().range();
-    return function(d, i) {return colors[i % colors.length]};
+    return function(d, i) { return d.color || colors[i % colors.length] };
 }
 
 
@@ -2303,6 +2303,8 @@ nv.models.distribution = function() {
       size = 8,
       axis = 'x', // 'x' or 'y'... horizontal or vertical
       getData = function(d) { return d[axis] },  // defaults d.x or d.y
+      getSeries   = function(d) { return d }, // accessor to get the array of series from the initial data structure provided
+      getPoints   = function(d) { return d.values }, // accessor to get the array of pointd from the array of series
       color = nv.utils.defaultColor(),
       domain;
 
@@ -2333,7 +2335,7 @@ nv.models.distribution = function() {
       wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
       var distWrap = g.selectAll('g.nv-dist')
-          .data(function(d) { return d }, function(d) { return d.key });
+          .data(getSeries, function(d) { return d.key });
 
       distWrap.enter().append('g')
       distWrap
@@ -2342,7 +2344,7 @@ nv.models.distribution = function() {
           //.style('stroke', function(d,i) { return color.filter(function(d,i) { return data[i] && !data[i].disabled })[i % color.length] });
 
       var dist = distWrap.selectAll('line.nv-dist' + axis)
-          .data(function(d) { return d.values })
+          .data(getPoints)
       dist.enter().append('line')
           .attr(axis + '1', function(d,i) { return scale0(getData(d,i)) })
           .attr(axis + '2', function(d,i) { return scale0(getData(d,i)) })
@@ -2369,6 +2371,18 @@ nv.models.distribution = function() {
     return chart;
   }
 
+
+  chart.series = function(_) {
+    if (!arguments.length) return getSeries;
+    getSeries = _;
+    return chart;
+  };
+
+  chart.points = function(_) {
+    if (!arguments.length) return getPoints;
+    getPoints = _;
+    return chart;
+  };
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
@@ -2707,6 +2721,7 @@ nv.models.legend = function() {
       width = 400,
       height = 20,
       getKey = function(d) { return d.key },
+      getSeries   = function(d) { return d }, // accessor to get the array of series from the initial data structure provided
       color = nv.utils.defaultColor(),
       align = true;
 
@@ -2725,7 +2740,7 @@ nv.models.legend = function() {
 
 
       var series = g.selectAll('.nv-series')
-          .data(function(d) { return d });
+          .data(getSeries);
       var seriesEnter = series.enter().append('g').attr('class', 'nv-series')
           .on('mouseover', function(d,i) {
             dispatch.legendMouseover(d,i);  //TODO: Make consistent with other event objects
@@ -2843,6 +2858,12 @@ nv.models.legend = function() {
 
 
   chart.dispatch = dispatch;
+
+  chart.series = function(_) {
+    if (!arguments.length) return getSeries;
+    getSeries = _;
+    return chart;
+  };
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
