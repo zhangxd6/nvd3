@@ -43,7 +43,7 @@ nv.models.distribution = function() {
       distWrap
           .attr('class', function(d,i) { return 'nv-dist nv-series-' + i })
           .style('stroke', function(d,i) { return color(d, i) })
-          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 })
+          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 }) //TODO: this hides disabled lines, when ideally it would not plot them for performance reasons
           //.style('stroke', function(d,i) { return color.filter(function(d,i) { return data[i] && !data[i].disabled })[i % color.length] });
 
       var dist = distWrap.selectAll('line.nv-dist' + axis)

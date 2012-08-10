@@ -258,7 +258,7 @@ nv.models.scatter = function() {
       d3.transition(groups)
           .style('fill', function(d,i) { return color(d, i) })
           .style('stroke', function(d,i) { return color(d, i) })
-          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 })
+          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 }) //TODO: this hides disabled groups, dieally it would not plot them, for performance reasons
           .style('fill-opacity', function(d,i) { return d.disabled ? 0 : .5 });
 
 
