@@ -15,6 +15,7 @@ nv.models.line = function() {
       defined = function(d,i) { return !isNaN(getY(d,i)) && getY(d,i) !== null }, // allows a line to be not continous when it is not defined
       isArea = function(d) { return d.area }, // decides if a line is an area or just a line
       clipEdge = false, // if true, masks lines within x and y scale
+      removeBars = false, // if true, if series.bar == true it will be treated as disabled
       x, y, //can be accessed via chart.scatter.[x/y]Scale()
       interpolate = "linear"; // controls the line interpolation
 
@@ -97,8 +98,8 @@ nv.models.line = function() {
           .style('fill', function(d,i){ return color(d, i) })
           .style('stroke', function(d,i){ return color(d, i)});
       d3.transition(groups)
-          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 }) //TODO: this hides disabled groups, dieally it would not plot them, for performance reasons
-          .style('fill-opacity', function(d,i) { return d.disabled ? 0 : .5 });
+          .style('stroke-opacity', function(d,i) { return d.disabled || (removeBars && d.bar) ? 0 : 1 }) //TODO: this hides disabled groups, ideally it would not plot them, for performance reasons
+          .style('fill-opacity', function(d,i) { return d.disabled || (removeBars && d.bar) ? 0 : .5 });
 
 
 
@@ -225,6 +226,13 @@ nv.models.line = function() {
   chart.clipEdge = function(_) {
     if (!arguments.length) return clipEdge;
     clipEdge = _;
+    return chart;
+  };
+
+  chart.removeBars = function(_) {
+    if (!arguments.length) return removeBars;
+    scatter.removeBars(_);
+    removeBars = _;
     return chart;
   };
 

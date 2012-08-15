@@ -32,6 +32,7 @@ nv.models.scatter = function() {
    ,  yDomain      = null // Override y domain
    ,  sizeDomain   = null // Override point size domain
    ,  singlePoint  = false
+   ,  removeBars   = false
    ,  dispatch     = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
    ;
 
@@ -76,7 +77,7 @@ nv.models.scatter = function() {
             d3.merge(
               getSeries(data)
                 .filter(function(d,j) {
-                  return !d.disabled
+                  return !d.disabled && !(removeBars && d.bar)
                 })
                 .map(function(d,j) {
                   return getPoints(d,j).map(function(d,i) {
@@ -158,7 +159,7 @@ nv.models.scatter = function() {
 
         var vertices = d3.merge(getSeries(data)
             .map(function(group, groupIndex) {
-              return group.disabled? [] : getPoints(group, groupIndex)
+              return group.disabled || (removeBars && group.bar) ? [] : getPoints(group, groupIndex)
                 .filter(pointActive) // remove non-interactive points
                 .map(function(point, pointIndex) {
                   // *Adding noise to make duplicates very unlikely
@@ -258,8 +259,8 @@ nv.models.scatter = function() {
       d3.transition(groups)
           .style('fill', function(d,i) { return color(d, i) })
           .style('stroke', function(d,i) { return color(d, i) })
-          .style('stroke-opacity', function(d,i) { return d.disabled ? 0 : 1 }) //TODO: this hides disabled groups, dieally it would not plot them, for performance reasons
-          .style('fill-opacity', function(d,i) { return d.disabled ? 0 : .5 });
+          .style('stroke-opacity', function(d,i) { return d.disabled || (removeBars && d.bar) ? 0 : 1 }) //TODO: this hides disabled groups, dieally it would not plot them, for performance reasons
+          .style('fill-opacity', function(d,i) { return d.disabled || (removeBars && d.bar) ? 0 : .5 });
 
 
       var points = groups.selectAll('path.nv-point')
@@ -450,6 +451,12 @@ nv.models.scatter = function() {
   chart.pointActive = function(_) {
     if (!arguments.length) return pointActive;
     pointActive = _;
+    return chart;
+  };
+
+  chart.removeBars = function(_) {
+    if (!arguments.length) return removeBars;
+    removeBars = _;
     return chart;
   };
 
