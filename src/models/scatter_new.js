@@ -59,7 +59,7 @@ nv.models.scatter = function() {
           z0; // old z-scale (size scale)
 
       //add series index to each data point for reference
-      data = data.map(function(series, i) {
+      getSeries(data).map(function(series, i) {
         getPoints(series,i).map(function(point) {
           point.series = i;
           return point;

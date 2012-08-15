@@ -6,7 +6,7 @@ nv.models.cumulativeLineChart = function() {
   //------------------------------------------------------------
 
   var margin = {top: 30, right: 30, bottom: 50, left: 60},
-      color = nv.utils.getColor(),
+      color = nv.utils.defaultColor(),
       width = null,
       height = null,
       showLegend = true,
@@ -322,7 +322,7 @@ nv.models.cumulativeLineChart = function() {
   chart.xAxis = xAxis;
   chart.yAxis = yAxis;
 
-  d3.rebind(chart, lines, 'defined', 'isArea', 'x', 'y', 'size', 'xDomain', 'yDomain', 'forceX', 'forceY', 'interactive', 'clipEdge', 'clipVoronoi', 'id');
+  d3.rebind(chart, lines, 'points', 'series', 'seriesKey', 'defined', 'isArea', 'x', 'y', 'size', 'xDomain', 'yDomain', 'forceX', 'forceY', 'interactive', 'clipEdge', 'clipVoronoi', 'id');
 
 
   chart.margin = function(_) {

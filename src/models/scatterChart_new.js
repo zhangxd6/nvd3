@@ -81,7 +81,7 @@ nv.models.scatterChart = function() {
           availableHeight = (height || parseInt(container.style('height')) || 400)
                              - margin.top - margin.bottom;
 
-      if (!data || !data.length || !data.filter(function(d,i) { return scatter.points()(d,i).length }).length) {
+      if (!data || !scatter.series()(data).length || !scatter.series()(data).filter(function(d,i) { return scatter.points()(d,i).length }).length) {
         container.append('text')
           .attr('class', 'nvd3 nv-noData')
           .attr('x', availableWidth / 2)
