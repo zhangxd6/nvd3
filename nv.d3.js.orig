@@ -2572,6 +2572,8 @@ nv.models.discreteBarChart = function() {
 }
 
 nv.models.distribution = function() {
+<<<<<<< HEAD
+=======
   var margin = {top: 0, right: 0, bottom: 0, left: 0},
       width = 400, //technically width or height depending on x or y....
       size = 8,
@@ -2581,6 +2583,7 @@ nv.models.distribution = function() {
       getPoints   = function(d) { return d.values }, // accessor to get the array of pointd from the array of series
       color = nv.utils.defaultColor(),
       domain;
+>>>>>>> upstream/custom_data_accessors
 
   //============================================================
   // Public Variables with Default Settings
@@ -2671,6 +2674,11 @@ nv.models.distribution = function() {
   }
 
 
+<<<<<<< HEAD
+  //============================================================
+  // Expose Public Variables
+  //------------------------------------------------------------
+=======
   chart.series = function(_) {
     if (!arguments.length) return getSeries;
     getSeries = _;
@@ -2682,6 +2690,7 @@ nv.models.distribution = function() {
     getPoints = _;
     return chart;
   };
+>>>>>>> upstream/custom_data_accessors
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
@@ -3041,6 +3050,8 @@ nv.models.indentedTree = function() {
   return chart;
 }
 nv.models.legend = function() {
+<<<<<<< HEAD
+=======
   var margin = {top: 5, right: 0, bottom: 5, left: 0},
       width = 400,
       height = 20,
@@ -3048,6 +3059,7 @@ nv.models.legend = function() {
       getSeries   = function(d) { return d }, // accessor to get the array of series from the initial data structure provided
       color = nv.utils.defaultColor(),
       align = true;
+>>>>>>> upstream/custom_data_accessors
 
   //============================================================
   // Public Variables with Default Settings
